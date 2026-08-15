@@ -19,7 +19,12 @@ target/
 *.workshop_id
 *.dll
 *.xcf
+*.ps1
 
+
+tools/*
+previews/*
+target/*
 .cargo/*
 .vscode/*
 rust-toolchain.toml
