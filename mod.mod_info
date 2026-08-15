@@ -2,7 +2,7 @@
   "mod_id": "champ_attack_info_tfm2",
   "name": "Display Champion Basic Attack Info",
   "author": "shirograhm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Adds a basic attack card to the Champ Info screen, alongside the two skills and the ultimate. Meant to be used wth modded champions that have special attack text.",
   "last_updated": "2026-08-15",
   "dependencies": [

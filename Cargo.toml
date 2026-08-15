@@ -1,6 +1,6 @@
 [package]
 name = "champ_attack_info_tfm2"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [lib]
