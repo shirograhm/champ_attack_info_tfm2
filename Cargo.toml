@@ -1,0 +1,13 @@
+[package]
+name = "champ_attack_info_tfm2"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+# The built DLL must be named after the mod folder: champ_attack_info_tfm2.dll
+crate-type = ["cdylib"]
+
+[dependencies]
+mod-api-stable = { path = "../mod-api-stable" }
+
+[workspace]

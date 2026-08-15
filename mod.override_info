@@ -1,0 +1,6 @@
+{
+  "asset/base/ui/layout/champion_info": {
+    "remapping": "asset/champ_attack_info_tfm2/ui/layout/champion_info",
+    "type": "override"
+  }
+}

@@ -1,0 +1,57 @@
+{
+    "en": {
+        "attack_name": "Basic Attack",
+        "attack_rank": "Lv. 1",
+        "attack_desc": "Deal <#ff9028ff><i#asset/base/ui/banpick/champion_stat_icon:ad_0>100% attack damage<> as <#ff9028ff>physical damage<>."
+    },
+    "ko": {
+        "attack_name": "기본 공격",
+        "attack_rank": "Lv. 1",
+        "attack_desc": "<#ff9028ff><i#asset/base/ui/banpick/champion_stat_icon:ad_0>공격력의 100%<> 만큼의 <#ff9028ff>물리 피해<>를 입힌다."
+    },
+    "ja": {
+        "attack_name": "基本攻撃",
+        "attack_rank": "Lv. 1",
+        "attack_desc": "<#ff9028ff><i#asset/base/ui/banpick/champion_stat_icon:ad_0>攻撃力の100%<>の<#ff9028ff>物理ダメージ<>を与える。"
+    },
+    "de": {
+        "attack_name": "Grundangriff",
+        "attack_rank": "Lv. 1",
+        "attack_desc": "Fügt <#ff9028ff><i#asset/base/ui/banpick/champion_stat_icon:ad_0>100% des Angriffs<> als <#ff9028ff>physischen Schaden<> zu."
+    },
+    "vi": {
+        "attack_name": "Đánh Thường",
+        "attack_rank": "Lv. 1",
+        "attack_desc": "Gây <#ff9028ff>Sát thương Vật lý<> bằng <#ff9028ff><i#asset/base/ui/banpick/champion_stat_icon:ad_0>100% SMCK<>."
+    },
+    "pt-BR": {
+        "attack_name": "Ataque básico",
+        "attack_rank": "Lv. 1",
+        "attack_desc": "Causa <#ff9028ff><i#asset/base/ui/banpick/champion_stat_icon:ad_0>100% do poder de ataque<> como <#ff9028ff>dano físico<>."
+    },
+    "fr": {
+        "attack_name": "Attaque de base",
+        "attack_rank": "Lv. 1",
+        "attack_desc": "Inflige <#ff9028ff><i#asset/base/ui/banpick/champion_stat_icon:ad_0>100%<> des dégâts d'attaque comme <#ff9028ff>dégâts physiques<>."
+    },
+    "es-ES": {
+        "attack_name": "Ataque básico",
+        "attack_rank": "Lv. 1",
+        "attack_desc": "Inflige <#ff9028ff><i#asset/base/ui/banpick/champion_stat_icon:ad_0>100%<> del daño de ataque como <#ff9028ff>daño físico<>."
+    },
+    "it": {
+        "attack_name": "Attacco base",
+        "attack_rank": "Lv. 1",
+        "attack_desc": "Infligge <#ff9028ff><i#asset/base/ui/banpick/champion_stat_icon:ad_0>100% dei danni d'attacco<> come <#ff9028ff>danni fisici<>."
+    },
+    "zh-hans": {
+        "attack_name": "普通攻击",
+        "attack_rank": "Lv. 1",
+        "attack_desc": "造成<#ff9028ff><i#asset/base/ui/banpick/champion_stat_icon:ad_0>100%攻击力<>点<#ff9028ff>物理伤害<>。"
+    },
+    "ru": {
+        "attack_name": "Базовая атака",
+        "attack_rank": "Lv. 1",
+        "attack_desc": "Наносит <#ff9028ff><i#asset/base/ui/banpick/champion_stat_icon:ad_0>100% физического урона от силы атаки<>."
+    }
+}
