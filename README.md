@@ -58,8 +58,12 @@ Two things the stable API does not give directly:
   a path at all. It searches the live tree with `ui_child_names` for a node
   called `passive` and takes its parent as the row, which is both
   version-proof and cheaper to maintain than a list of guesses. The search is
-  throttled to twice a second and stops once the row is found; a plain
-  `ui_exists` re-check keeps it after that.
+  throttled to twice a second, and it runs only until the row is found the
+  first time — the path is kept afterwards, closed screen or not, since a
+  screen does not move between mounts within a session. From then on the
+  extension's entire per-frame cost is one `ui_exists` on a path it already
+  holds, and reopening the tab costs the same one call rather than another
+  walk.
 - *Which champion is selected.* The screen's `#champion_info/#name` label ships
   `visible: false` with empty text, so the extension reads the **skill card's**
   description off the screen and matches it against every
@@ -92,6 +96,13 @@ Two things the stable API does not give directly:
   gives the game folder and `mods` sits beside it. Found, the icon is set as
   `asset/<mod_id>/icons/<champion>_base_attack`; not found, the icon slot goes
   `visible: false`.
+
+  Both this table and the skill-text index are built in `on_init` — neither
+  needs the screen, and `on_init` is the one hook that is not on the frame
+  clock, so the champion tab never waits on them. Champion data not being
+  loaded that early is the only miss, and the screen being up is proof it has
+  loaded since, so that case rebuilds there.
+
   Title and icon are both per champion, so they are written when the selection
   changes, not per frame. The change is detected off the skill card's text
   rather than the matched id, since that text is the only thing on screen that
