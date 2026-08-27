@@ -1,5 +1,6 @@
 use mod_api_stable::*;
 use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 const MOD_ID: &str = "champ_attack_info_tfm2";
@@ -156,36 +157,130 @@ impl Pattern {
     }
 }
 
-// Search for icons at `mods/<mod_id>/icons/<champion>_base_attack.png`, for all mod_ids
+/// Steam app id for Teamfight Manager 2, used to locate subscribed Workshop mods.
+const STEAM_APP_ID: &str = "3009300";
+
+/// The directories that hold installed mods, in preference order.
+///
+/// A mod reaches the game one of two ways, and the icons have to be found in
+/// both. A local build is deployed to `<game>/mods/<mod id>`. A Workshop
+/// subscription is downloaded by Steam to
+/// `<library>/steamapps/workshop/content/<app id>/<published file id>` and left
+/// there - it is never copied into `<game>/mods`, and its folder is named by
+/// number rather than by mod id.
+fn mod_roots() -> Vec<PathBuf> {
+    let Some(game) = std::env::current_exe()
+        .ok()
+        .and_then(|exe| exe.parent().map(Path::to_path_buf))
+    else {
+        return Vec::new();
+    };
+
+    let mut roots = vec![game.join("mods")];
+    // `<library>/steamapps/common/<game>` -> `<library>/steamapps/workshop/...`
+    if let Some(steamapps) = game.parent().and_then(Path::parent) {
+        roots.push(steamapps.join("workshop").join("content").join(STEAM_APP_ID));
+    }
+    roots
+}
+
+/// The mod id owning `dir`, which is what asset paths are keyed by.
+///
+/// A Workshop folder is a published file id, so the id has to be read out of the
+/// manifest inside it. Deployed folders are already named after the mod, which is
+/// the fallback when there is no readable manifest.
+fn mod_id_at(dir: &Path) -> Option<String> {
+    let manifest = std::fs::read_to_string(dir.join("mod.mod_info")).ok()?;
+    let id = top_level_string(&manifest, "mod_id")?;
+    (!id.is_empty()).then_some(id)
+}
+
+/// Read the JSON string opening at `open`, plus the index just past its close.
+fn read_string(json: &str, open: usize) -> Option<(&str, usize)> {
+    let bytes = json.as_bytes();
+    let mut i = open + 1;
+    while i < bytes.len() {
+        match bytes[i] {
+            // Escapes are skipped, not decoded - nothing read out of a manifest
+            // needs them, and this keeps a `\"` from ending the string early.
+            b'\\' => i += 2,
+            b'"' => return Some((&json[open + 1..i], i + 1)),
+            _ => i += 1,
+        }
+    }
+    None
+}
+
+/// Pull one string field off the outermost object, without a JSON dependency.
+///
+/// Depth is the whole point: `mod.mod_info` lists dependencies as objects that
+/// each carry their own `mod_id`, and those are written before the manifest's
+/// own, so a plain substring search finds a dependency - usually `base` - first.
+fn top_level_string(json: &str, key: &str) -> Option<String> {
+    let bytes = json.as_bytes();
+    let mut i = 0;
+    let mut depth = 0usize;
+    let mut last_key = "";
+    while i < bytes.len() {
+        match bytes[i] {
+            b'{' | b'[' => {
+                depth += 1;
+                i += 1;
+            }
+            b'}' | b']' => {
+                depth = depth.saturating_sub(1);
+                i += 1;
+            }
+            b'"' => {
+                let (text, next) = read_string(json, i)?;
+                i = next;
+                // A `:` after it makes it a key; otherwise it is the value of
+                // whichever key came last.
+                let colon = bytes[i..]
+                    .iter()
+                    .find(|byte| !byte.is_ascii_whitespace())
+                    == Some(&b':');
+                if colon {
+                    last_key = text;
+                } else if depth == 1 && last_key == key {
+                    return Some(text.to_string());
+                }
+            }
+            _ => i += 1,
+        }
+    }
+    None
+}
+
+// Search for icons at `<mod>/icons/<champion>_base_attack.png`, for all installed mods
 fn icon_index() -> HashMap<String, String> {
     let mut icons = HashMap::new();
-    let Some(mods) = std::env::current_exe()
-        .ok()
-        .and_then(|exe| Some(exe.parent()?.join("mods")))
-    else {
-        return icons;
-    };
-    for entry in std::fs::read_dir(mods).into_iter().flatten().flatten() {
-        let Some(mod_id) = entry.file_name().to_str().map(str::to_string) else {
-            continue;
-        };
-        for icon in std::fs::read_dir(entry.path().join("icons"))
-            .into_iter()
-            .flatten()
-            .flatten()
-        {
-            let name = icon.file_name();
-            let Some(champion) = name
-                .to_str()
-                .and_then(|name| name.strip_suffix("_base_attack.png"))
-            else {
+    for root in mod_roots() {
+        for entry in std::fs::read_dir(root).into_iter().flatten().flatten() {
+            let dir = entry.path();
+            let Some(mod_id) = mod_id_at(&dir).or_else(|| {
+                entry.file_name().to_str().map(str::to_string)
+            }) else {
                 continue;
             };
+            for icon in std::fs::read_dir(dir.join("icons"))
+                .into_iter()
+                .flatten()
+                .flatten()
+            {
+                let name = icon.file_name();
+                let Some(champion) = name
+                    .to_str()
+                    .and_then(|name| name.strip_suffix("_base_attack.png"))
+                else {
+                    continue;
+                };
 
-            // First mod wins
-            icons
-                .entry(champion.to_string())
-                .or_insert_with(|| format!("asset/{mod_id}/icons/{champion}_base_attack"));
+                // First mod wins
+                icons
+                    .entry(champion.to_string())
+                    .or_insert_with(|| format!("asset/{mod_id}/icons/{champion}_base_attack"));
+            }
         }
     }
     icons
@@ -350,3 +445,47 @@ fn init(host: &StableHost) -> StableMod {
 }
 
 declare_stable_mod!(init);
+
+#[cfg(test)]
+mod tests {
+    use super::top_level_string;
+
+    /// The manifest that broke the Workshop icon lookup: `dependencies` carries
+    /// its own `mod_id`, and it is serialised before the manifest's own.
+    const MANIFEST: &str = r#"{
+  "author": "shirograhm",
+  "dependencies": [
+    {
+      "mod_id": "base",
+      "version": ">=0.5.0"
+    }
+  ],
+  "description": "Adds characters from Avatar: The Last Airbender to Teamfight Manager 2.",
+  "mod_id": "avatar_characters_tfm2",
+  "name": "Avatar Characters",
+  "version": "0.1.1"
+}"#;
+
+    #[test]
+    fn reads_past_a_nested_mod_id() {
+        assert_eq!(
+            top_level_string(MANIFEST, "mod_id").as_deref(),
+            Some("avatar_characters_tfm2")
+        );
+    }
+
+    #[test]
+    fn reads_a_mod_id_written_before_dependencies() {
+        let manifest = r#"{"mod_id": "champ_attack_info_tfm2",
+          "dependencies": [{"mod_id": "base"}]}"#;
+        assert_eq!(
+            top_level_string(manifest, "mod_id").as_deref(),
+            Some("champ_attack_info_tfm2")
+        );
+    }
+
+    #[test]
+    fn missing_key_is_none() {
+        assert_eq!(top_level_string(r#"{"name": "x"}"#, "mod_id"), None);
+    }
+}
