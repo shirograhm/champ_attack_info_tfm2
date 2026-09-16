@@ -1630,6 +1630,7 @@ champion_info:champion_info_ui {
       }
 
       #passive:color {
+        visible: false;
         width: 391px;
         height: 275px;
         x: 0px;
@@ -1729,9 +1730,9 @@ champion_info:champion_info_ui {
         }
       }
       #skill1:color {
-        width: 391px;
+        width: 527px;
         height: 275px;
-        x: 403px;
+        x: 0px;
         y: 100px;
 
         color: #161721ff;
@@ -1747,11 +1748,11 @@ champion_info:champion_info_ui {
         }
 
         #data:empty {
-          width: 371px;
+          width: 507px;
           height: 255px;
 
           #icon_slot:empty {
-            width: 371px;
+            width: 507px;
             height: 40px;
 
             #icon_bg:color {
@@ -1794,7 +1795,7 @@ champion_info:champion_info_ui {
               width: 78px;
               height: 40px;
 
-              x: 293px;
+              x: 104px;
               anchor_x: 0;
 
               y: 0px;
@@ -1830,8 +1831,8 @@ champion_info:champion_info_ui {
 
             #name:label {
               @"asset/base/style/main#bold_label";
-              x: 104px;
-              width: 179px;
+              x: 192px;
+              width: 315px;
               height: 40px;
 
               size: 18;
@@ -1843,7 +1844,7 @@ champion_info:champion_info_ui {
 
           #bar:color {
             color: #4a4c56ff;
-            width: 371px;
+            width: 507px;
             y: 50px;
             height: 1px;
           }
@@ -1852,7 +1853,7 @@ champion_info:champion_info_ui {
             @"asset/base/style/main#label";
             x: 0px;
 
-            width: 371px;
+            width: 507px;
             height: 195px;
 
             y: 60px;
@@ -1867,9 +1868,9 @@ champion_info:champion_info_ui {
       }
 
       #skill2:color {
-        width: 391px;
+        width: 526px;
         height: 275px;
-        x: 806px;
+        x: 537px;
         y: 100px;
 
         color: #161721ff;
@@ -1885,11 +1886,11 @@ champion_info:champion_info_ui {
         }
 
         #data:empty {
-          width: 371px;
+          width: 506px;
           height: 255px;
 
           #icon_slot:empty {
-            width: 371px;
+            width: 506px;
             height: 40px;
 
             #icon_bg:color {
@@ -1932,7 +1933,7 @@ champion_info:champion_info_ui {
               width: 78px;
               height: 40px;
 
-              x: 293px;
+              x: 104px;
               anchor_x: 0;
 
               y: 0px;
@@ -1968,8 +1969,8 @@ champion_info:champion_info_ui {
 
             #name:label {
               @"asset/base/style/main#bold_label";
-              x: 104px;
-              width: 179px;
+              x: 192px;
+              width: 314px;
               height: 40px;
 
               size: 18;
@@ -1981,7 +1982,7 @@ champion_info:champion_info_ui {
 
           #bar:color {
             color: #4a4c56ff;
-            width: 371px;
+            width: 506px;
             y: 50px;
             height: 1px;
           }
@@ -1990,7 +1991,7 @@ champion_info:champion_info_ui {
             @"asset/base/style/main#label";
             x: 0px;
 
-            width: 371px;
+            width: 506px;
             height: 195px;
 
             y: 60px;
@@ -2005,9 +2006,9 @@ champion_info:champion_info_ui {
       }
 
       #ult:color {
-        width: 391px;
+        width: 527px;
         height: 275px;
-        x: 1209px;
+        x: 1073px;
         y: 100px;
 
         color: #161721ff;
@@ -2023,11 +2024,11 @@ champion_info:champion_info_ui {
         }
 
         #data:empty {
-          width: 371px;
+          width: 507px;
           height: 255px;
 
           #icon_slot:empty {
-            width: 371px;
+            width: 507px;
             height: 40px;
 
             #icon_bg:color {
@@ -2070,7 +2071,7 @@ champion_info:champion_info_ui {
               width: 78px;
               height: 40px;
 
-              x: 293px;
+              x: 104px;
               anchor_x: 0;
 
               y: 0px;
@@ -2106,8 +2107,8 @@ champion_info:champion_info_ui {
 
             #name:label {
               @"asset/base/style/main#bold_label";
-              x: 104px;
-              width: 179px;
+              x: 192px;
+              width: 315px;
               height: 40px;
 
               size: 18;
@@ -2119,7 +2120,7 @@ champion_info:champion_info_ui {
 
           #bar:color {
             color: #4a4c56ff;
-            width: 371px;
+            width: 507px;
             y: 50px;
             height: 1px;
           }
@@ -2128,7 +2129,7 @@ champion_info:champion_info_ui {
             @"asset/base/style/main#label";
             x: 0px;
 
-            width: 371px;
+            width: 507px;
             height: 195px;
 
             y: 60px;

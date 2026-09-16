@@ -3,9 +3,9 @@ Adds a fourth card to the Champ Info screen, to the left of Skill 1, showing the
 The base game gives every champion three cards - Skill 1, Skill 2, and the Ultimate - and says nothing about what their basic attack actually does. Modded champions often have basic attacks that are a real part of their kit: on-hit effects, stacking debuffs, split damage. This mod gives that a card of its own.
 
 [h1] What It Shows [/h1]
-[b]Vanilla champions[/b] get a generic card: "Basic Attack - Deal 100% attack damage as physical damage."
+[b]Champions whose mod ships basic attack text[/b] get a card with that text, along with a custom name and icon if the mod provides them.
 
-[b]Modded champions[/b] that ship their own basic attack text get that text instead, along with a custom name and icon if the mod provides them.
+[b]Champions without basic attack text[/b] - including every vanilla champion - keep the normal three-card layout.
 
 The card updates as you click through the roster, and matches the styling of the three skill cards next to it.
 
@@ -13,7 +13,7 @@ The card updates as you click through the roster, and matches the styling of the
 The default card text is translated into English, Korean, Japanese, German, Vietnamese, Brazilian Portuguese, French, Spanish, Italian, Simplified Chinese, and Russian. Custom champion text follows whatever locales that champion's own mod supports.
 
 [h1] For Modders [/h1]
-Nothing needs to be added to your mod for this to work - the card appears for every champion regardless. Everything below is optional, and only fills in the card with your own content.
+The card only appears for champions that provide an attack description. The name and icon below are optional.
 
 [h2] Attack Description [/h2]
 Add an [b]attack[/b] key alongside your existing [b]skill[/b], [b]skill2[/b], and [b]ult[/b] descriptions in your champion text asset:

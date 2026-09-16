@@ -15,6 +15,33 @@ const CARD_NAME: &str = "passive.data.icon_slot.name";
 const CARD_RANK: &str = "passive.data.icon_slot.text";
 const PROBE: &str = "skill1.data.desc";
 const CARD: &str = "passive";
+const SKILL_CARDS: [&str; 3] = ["skill1", "skill2", "ult"];
+
+// Card-relative children resized when the row is rearranged
+const CARD_FULL_WIDTH: [&str; 4] = ["data", "data.icon_slot", "data.bar", "data.desc"];
+const CARD_CHILD_NAME: &str = "data.icon_slot.name";
+const CARD_CHILD_COOLTIME: &str = "data.icon_slot.cooltime";
+
+// Card row geometry, matching tools/build_layout.py. The row is 1600px wide
+// either way: three cards is the base game's own spread, which is what the
+// layout file ships and what the screen keeps when there is no attack card;
+// four splits the same row into 391s with 12px gaps.
+const THREE_CARDS: [(f32, f32); 3] = [(0.0, 527.0), (537.0, 526.0), (1073.0, 527.0)];
+const FOUR_CARDS: [(f32, f32); 4] = [
+    (0.0, 391.0),
+    (403.0, 391.0),
+    (806.0, 391.0),
+    (1209.0, 391.0),
+];
+const CARD_PADDING: f32 = 20.0;
+const COOLTIME_WIDTH: f32 = 78.0;
+// Header columns. Three cards keeps the base game's icon/rank/cooldown/name;
+// four moves the cooldown to the right edge to leave the narrower card's name
+// a middle column of its own. Either way the name ends 192px past the icon.
+const NAME_X_WIDE: f32 = 192.0;
+const COOLTIME_X_WIDE: f32 = 104.0;
+const NAME_X_NARROW: f32 = 104.0;
+const NAME_TRAILING: f32 = 192.0;
 
 const MAX_DEPTH: usize = 16;
 
@@ -57,6 +84,44 @@ impl Screen {
         let screen = Self { root };
         ctx.ui_exists(&screen.node(CARD_DESC)).then_some(screen)
     }
+
+    /// Show or hide the attack card and re-spread the row to suit.
+    ///
+    /// Hidden is the layout file's own state, so the screen starts out as the
+    /// base game's three cards and only widens to four once a champion turns
+    /// up with attack text of its own.
+    fn arrange(&self, ctx: &mut StableClient<'_>, show_attack: bool) {
+        ctx.ui_set_properties(&self.node(CARD), &format!("visible: {show_attack};"));
+
+        let frames: &[(f32, f32)] = if show_attack { &FOUR_CARDS } else { &THREE_CARDS };
+        let cards = show_attack.then_some(CARD).into_iter().chain(SKILL_CARDS);
+
+        for (card, &(x, width)) in cards.zip(frames) {
+            ctx.ui_set_properties(&self.node(card), &format!("x: {x}px; width: {width}px;"));
+
+            let body = width - CARD_PADDING;
+            for child in CARD_FULL_WIDTH {
+                let props = format!("width: {body}px;");
+                ctx.ui_set_properties(&self.node(&join(card, child)), &props);
+            }
+
+            let (name_x, cooltime_x) = if show_attack {
+                (NAME_X_NARROW, body - COOLTIME_WIDTH)
+            } else {
+                (NAME_X_WIDE, COOLTIME_X_WIDE)
+            };
+            let name_width = body - NAME_TRAILING;
+            let props = format!("x: {name_x}px; width: {name_width}px;");
+            ctx.ui_set_properties(&self.node(&join(card, CARD_CHILD_NAME)), &props);
+
+            // The attack card has no cooldown chip to place - a basic attack
+            // fires on a rate, and the layout drops the slot outright.
+            let cooltime = self.node(&join(card, CARD_CHILD_COOLTIME));
+            if ctx.ui_exists(&cooltime) {
+                ctx.ui_set_properties(&cooltime, &format!("x: {cooltime_x}px;"));
+            }
+        }
+    }
 }
 
 const SEARCH_INTERVAL_FRAMES: u32 = 30;
@@ -70,6 +135,9 @@ struct State {
     icons: HashMap<String, String>,
     written: String,
     selection: String,
+    /// Whether the row is currently arranged with the attack card shown.
+    /// False is the layout file's own state, so a fresh screen needs no work.
+    arranged: bool,
 }
 
 struct ChampPassiveInfo {
@@ -382,6 +450,7 @@ impl StableExtension for ChampPassiveInfo {
         if !ctx.ui_exists(&screen.node(CARD_DESC)) {
             state.written.clear();
             state.selection.clear();
+            state.arranged = false;
             state.screen = Some(screen);
             return;
         }
@@ -397,9 +466,15 @@ impl StableExtension for ChampPassiveInfo {
             .as_ref()
             .and_then(|champion| Self::attack(ctx, champion));
 
-        let desc = attack
-            .or_else(|| Self::default_text(ctx, "attack_desc"))
-            .unwrap_or_default();
+        // Only champions that ship their own attack text get a card; for the
+        // rest the screen is left as the base game's three.
+        let show_attack = attack.is_some();
+        if state.arranged != show_attack {
+            screen.arrange(ctx, show_attack);
+            state.arranged = show_attack;
+        }
+
+        let desc = attack.unwrap_or_default();
         if state.written != desc {
             ctx.ui_set_text(&screen.node(CARD_DESC), &desc);
             state.written = desc;
