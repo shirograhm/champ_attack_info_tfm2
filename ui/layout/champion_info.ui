@@ -270,6 +270,23 @@ champion_info:champion_info_ui {
         }
       }
 
+      #unassign_btn:color_icon_button {
+        @"asset/base/style/main#secondary_button_active";
+        visible: false;
+        width: 440px;
+        height: 40px;
+
+        x: 0px;
+        y: 0px;
+        text: {
+          text: "#asset/base/text/ui?main.champion_info.unassign_tier";
+          font: "asset/base/font/set/bold";
+          size: 16;
+          align_x: Center;
+          align_y: Center;
+        }
+      }
+
       #reset_btn:color_icon_button {
         @"asset/base/style/main#tertiary_button";
         width: 320px;
